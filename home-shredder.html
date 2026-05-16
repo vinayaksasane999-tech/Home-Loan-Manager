@@ -19,12 +19,14 @@
 
         .container { max-width: 1200px; width: 100%; margin-top: 10px; }
 
-        .header { text-align: center; margin-bottom: 24px; padding: 0 8px; }
-        .header h1 { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #facc15, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; text-transform: uppercase; }
-        .header p { color: #8b93b3; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
+        /* Premium Header with Logo Integration */
+        .brand-header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; padding: 0 8px; text-align: center; }
+        .brand-logo { height: 50px; max-width: 180px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.2)); }
+        .header-text h1 { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, #facc15, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; text-transform: uppercase; }
+        .header-text p { color: #8b93b3; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
 
         .card { background: rgba(10, 15, 35, 0.85); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); width: 100%; }
-        .section-title { font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
 
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -38,13 +40,11 @@
         .input-group label { font-size: 11px; color: #8b93b3; font-weight: 600; text-transform: uppercase; }
         .input-group input, .input-group select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; outline: none; transition: 0.3s; width: 100%; }
         .input-group input:focus, .input-group select:focus { border-color: #facc15; background: rgba(250, 204, 21, 0.05); }
-        
-        .split-input { display: flex; gap: 5px; }
-        .split-input input { flex: 1; min-width: 0; }
-        .split-input select { width: 85px; padding: 12px 8px; cursor: pointer; }
 
-        .btn-premium { background: linear-gradient(135deg, #60a5fa, #3b82f6); border: none; color: white; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); }
-        .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3); }
+        /* Premium Action Container */
+        .action-container { display: flex; width: 100%; justify-content: center; padding: 4px 0; }
+        .btn-premium { background: linear-gradient(135deg, #60a5fa, #3b82f6); border: none; color: white; padding: 14px 28px; border-radius: 14px; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25); width: 100%; max-width: 400px; text-align: center; }
+        .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
         .auto-calc-btn { cursor: pointer; color: #60a5fa; font-size: 10px; font-weight: bold; letter-spacing: 1px; transition: 0.2s; }
         .auto-calc-btn:hover { color: #facc15; }
@@ -71,7 +71,7 @@
         .inline-input { background: transparent; border: none; border-bottom: 1px dashed rgba(96, 165, 250, 0.5); color: #60a5fa; font-size: 20px; font-weight: 900; width: 110px; text-align: center; outline: none; padding: 0; transition: 0.2s; }
         .inline-input:focus { border-bottom-color: #60a5fa; background: rgba(96, 165, 250, 0.05); }
 
-        /* Annual Stacked Bar Chart Wrapper */
+        /* Bar Chart Wrapper */
         .bar-chart-container { width: 100%; height: 260px; margin-top: 10px; position: relative; }
 
         /* Adaptive Amortization Engine Layout */
@@ -107,8 +107,10 @@
         /* Responsive Breakpoints & Mobile UI Morphing */
         @media (min-width: 768px) {
             body { padding: 24px; }
-            .header h1 { font-size: 42px; }
-            .header p { font-size: 13px; letter-spacing: 2px; }
+            .brand-header { flex-direction: row; justify-content: center; text-align: left; gap: 20px; margin-bottom: 30px; }
+            .brand-logo { height: 65px; }
+            .header-text h1 { font-size: 38px; }
+            .header-text p { font-size: 12px; letter-spacing: 2px; }
             .card { padding: 24px; }
             .summary-wrapper { flex-direction: row; justify-content: space-around; }
             .chart-container { width: 240px; height: 240px; }
@@ -142,9 +144,12 @@
 <body>
 
 <div class="container" id="printableArea">
-    <div class="header">
-        <h1>The 30-Year Shredder</h1>
-        <p>Tactical Debt Annihilation Engine</p>
+    <div class="brand-header">
+        <img src="logo.png" alt="Brand Logo" class="brand-logo" onerror="this.style.display='none'">
+        <div class="header-text">
+            <h1>The 30-Year Shredder</h1>
+            <p>Tactical Debt Annihilation Engine</p>
+        </div>
     </div>
 
     <div class="card" style="border-color: rgba(96, 165, 250, 0.2); background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), rgba(10, 15, 35, 0.85));">
@@ -174,10 +179,7 @@
     </div>
 
     <div class="card">
-        <div class="section-title">
-            Phase 2: War Room Parameters
-            <button class="btn-premium pdf-no-export" onclick="exportToPDF()">Export Report PDF</button>
-        </div>
+        <div class="section-title">Phase 2: War Room Parameters</div>
         <div class="config-grid">
             <div class="input-group">
                 <label>Loan Amount (₹)</label>
@@ -205,7 +207,11 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="action-container pdf-no-export">
+        <button class="btn-premium" onclick="exportToPDF()">Export Strategy Report PDF</button>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
         <div class="summary-wrapper">
             <div class="chart-container">
                 <canvas id="loanChart"></canvas>
@@ -237,7 +243,7 @@
     </div>
 
     <div class="card">
-        <div class="section-title">Year-by-Year Amortization Velocity</div>
+        <div class="section-title">Year-by-Year Principal vs Interest Analysis</div>
         <div class="bar-chart-container">
             <canvas id="annualBarChart"></canvas>
         </div>
@@ -354,7 +360,6 @@
         const monthlyRate = roi / 12 / 100;
         let runningBaseEmi = baseEmi;
 
-        // Visual tracking map for stacked bar graphs
         let yearlyDataMap = {};
 
         while (balance > 0 && monthCount < 1200) { 
@@ -401,7 +406,6 @@
                 extra: extraStrike
             });
 
-            // Map variables for stacked bar graphs
             if (!yearlyDataMap[calendarYear]) {
                 yearlyDataMap[calendarYear] = { principal: 0, interest: 0 };
             }
@@ -506,7 +510,6 @@
             tbody.appendChild(tr);
         });
 
-        // Dashboard Stats Update
         document.getElementById('statPrin').innerText = formatCur(totPrin);
         document.getElementById('statInt').innerText = formatCur(totInt);
         document.getElementById('pieTotal').innerText = formatCur(totPrin + totInt);
@@ -516,7 +519,6 @@
             document.getElementById('statDate').innerText = schedule[schedule.length - 1].date;
         }
 
-        // Render Donut Graph
         const ctxDonut = document.getElementById('loanChart').getContext('2d');
         if (loanChartInstance) {
             loanChartInstance.data.datasets[0].data = [totPrin, totInt];
@@ -549,12 +551,11 @@
             });
         }
 
-        // Parse Stacked Bar Chart Maps
         const yearsArray = Object.keys(yearlyDataMap);
         const annualPrincipalArray = yearsArray.map(y => yearlyDataMap[y].principal);
         const annualInterestArray = yearsArray.map(y => yearlyDataMap[y].interest);
 
-        // Render Stacked Bar Chart
+        // Render Grouped/Side-by-Side Bar Chart
         const ctxBar = document.getElementById('annualBarChart').getContext('2d');
         if (barChartInstance) {
             barChartInstance.data.labels = yearsArray;
@@ -575,8 +576,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { color: '#8b93b3', font: { size: 10 } } },
-                        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b93b3', font: { size: 10 }, callbacks: (val) => '₹' + (val/100000) + 'L' } }
+                        x: { stacked: false, grid: { display: false }, ticks: { color: '#8b93b3', font: { size: 10 } } },
+                        y: { stacked: false, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b93b3', font: { size: 10 }, callbacks: (val) => '₹' + (val/100000) + 'L' } }
                     },
                     plugins: {
                         legend: { display: true, position: 'top', labels: { color: '#cbd5e1', boxWidth: 12, font: { size: 11, weight: 'bold' } } },
@@ -591,11 +592,8 @@
         }
     }
 
-    // PDF Export Execution Block
     function exportToPDF() {
         const element = document.getElementById('printableArea');
-        
-        // Temporarily tag body elements for crisp scaling inside PDF engine
         document.body.classList.add('pdf-mode');
         
         const opt = {
@@ -608,7 +606,6 @@
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            // Restore smooth dark UI on user's active screen
             document.body.classList.remove('pdf-mode');
         });
     }
