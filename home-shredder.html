@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30-Year Loan Shredder</title>
+    <title>The Home Loan Manager</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
@@ -21,7 +25,7 @@
 
         /* Premium Header with Logo Integration */
         .brand-header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; padding: 0 8px; text-align: center; }
-        .brand-logo { height: 50px; max-width: 180px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.2)); }
+        .brand-logo { height: 55px; max-width: 180px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.2)); }
         .header-text h1 { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, #facc15, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; text-transform: uppercase; }
         .header-text p { color: #8b93b3; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
 
@@ -52,18 +56,19 @@
         /* Summary Dashboard Layout */
         .summary-wrapper { display: flex; flex-direction: column; gap: 24px; align-items: center; justify-content: center; }
         
-        .chart-container { position: relative; width: 200px; height: 200px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        /* Glassmorphic Shadow Ring Around Custom Donut Chart */
+        .chart-container { position: relative; width: 210px; height: 210px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: radial-gradient(circle, rgba(255,255,255,0.01) 60%, rgba(255,255,255,0.03) 100%); border-radius: 50%; padding: 10px; border: 1px solid rgba(255,255,255,0.02); }
         .chart-center-text { position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; pointer-events: none; }
-        .pie-title { font-size: 10px; color: #8b93b3; text-transform: uppercase; letter-spacing: 1px; }
-        .pie-value { font-size: 18px; font-weight: 900; color: white; }
+        .pie-title { font-size: 10px; color: #8b93b3; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 2px; }
+        .pie-value { font-size: 19px; font-weight: 900; color: white; letter-spacing: -0.5px; }
 
         .stat-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 16px; border-radius: 14px; text-align: center; width: 100%; }
         .stat-box.highlight { background: radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent); border-color: rgba(250, 204, 21, 0.2); }
         .stat-label { font-size: 11px; color: #8b93b3; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
         .stat-value { font-size: 22px; font-weight: 900; color: white; word-break: break-all; }
         
-        .text-green { color: #4ade80; }
-        .text-red { color: #ef4444; }
+        .text-green { color: #10b981; }
+        .text-red { color: #f43f5e; }
         .text-yellow { color: #facc15; }
         .text-blue { color: #60a5fa; }
 
@@ -86,13 +91,13 @@
         
         tr:hover { background: rgba(255,255,255,0.01); }
         tr.paid { opacity: 0.4; background: rgba(74, 222, 128, 0.03); }
-        tr.paid td { color: #4ade80; }
+        tr.paid td { color: #10b981; }
 
         .action-cell { display: flex; justify-content: flex-end; gap: 8px; align-items: center; }
         
-        .toggle-btn { background: transparent; border: 1px solid #4ade80; color: #4ade80; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .toggle-btn { background: transparent; border: 1px solid #10b981; color: #10b981; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .toggle-btn:hover { background: rgba(74, 222, 128, 0.1); }
-        tr.paid .toggle-btn { background: #4ade80; color: #000; }
+        tr.paid .toggle-btn { background: #10b981; color: #000; }
 
         .strike-menu { position: relative; display: inline-block; }
         .strike-btn { background: linear-gradient(135deg, #facc15, #eab308); border: none; color: black; width: 28px; height: 28px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(250, 204, 21, 0.2); transition: 0.2s; }
@@ -113,8 +118,8 @@
             .header-text p { font-size: 12px; letter-spacing: 2px; }
             .card { padding: 24px; }
             .summary-wrapper { flex-direction: row; justify-content: space-around; }
-            .chart-container { width: 240px; height: 240px; }
-            .pie-value { font-size: 22px; }
+            .chart-container { width: 250px; height: 250px; }
+            .pie-value { font-size: 23px; }
             .bar-chart-container { height: 320px; }
         }
 
@@ -145,7 +150,7 @@
 
 <div class="container" id="printableArea">
     <div class="brand-header">
-        <img src="logo.png" alt="Brand Logo" class="brand-logo" onerror="this.style.display='none'">
+        <img src="logo.png" alt="Brand Logo" class="brand-logo">
         <div class="header-text">
             <h1>The 30-Year Shredder</h1>
             <p>Tactical Debt Annihilation Engine</p>
@@ -461,8 +466,8 @@
                     let label = su.type === 'pct' ? `+${su.val}%` : `+₹${su.val}`;
                     stepUpUI = `
                         <div style="padding: 10px 14px; background: rgba(74, 222, 128, 0.08); border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color:#4ade80; font-size: 12px; font-weight: bold;">✅ Next Yr: ${label}</span>
-                            <span onclick="removeStepUp(event, '${row.key}', '${dropdownId}')" style="color:#ef4444; font-size:12px; cursor:pointer; font-weight: bold; padding: 2px 6px;">✕</span>
+                            <span style="color:#10b981; font-size: 12px; font-weight: bold;">✅ Next Yr: ${label}</span>
+                            <span onclick="removeStepUp(event, '${row.key}', '${dropdownId}')" style="color:#f43f5e; font-size:12px; cursor:pointer; font-weight: bold; padding: 2px 6px;">✕</span>
                         </div>
                     `;
                 } else {
@@ -519,6 +524,7 @@
             document.getElementById('statDate').innerText = schedule[schedule.length - 1].date;
         }
 
+        // High-Fidelity Custom Segmented Donut Initialization
         const ctxDonut = document.getElementById('loanChart').getContext('2d');
         if (loanChartInstance) {
             loanChartInstance.data.datasets[0].data = [totPrin, totInt];
@@ -530,15 +536,17 @@
                     labels: ['Principal Paid', 'Interest Bled'],
                     datasets: [{
                         data: [totPrin, totInt],
-                        backgroundColor: ['#4ade80', '#ef4444'],
+                        backgroundColor: ['#10b981', '#f43f5e'],
                         borderWidth: 0,
-                        hoverOffset: 4
+                        borderRadius: 8,  /* Rounded Capsule Arc Finishes */
+                        spacing: 6,       /* Clean standalone arc gaps */
+                        hoverOffset: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '75%',
+                    cutout: '82%', /* Ultra-sleek premium slim ring profile */
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -555,7 +563,6 @@
         const annualPrincipalArray = yearsArray.map(y => yearlyDataMap[y].principal);
         const annualInterestArray = yearsArray.map(y => yearlyDataMap[y].interest);
 
-        // Render Grouped/Side-by-Side Bar Chart
         const ctxBar = document.getElementById('annualBarChart').getContext('2d');
         if (barChartInstance) {
             barChartInstance.data.labels = yearsArray;
@@ -568,8 +575,8 @@
                 data: {
                     labels: yearsArray,
                     datasets: [
-                        { label: 'Principal Hit', data: annualPrincipalArray, backgroundColor: '#4ade80', borderRadius: 4 },
-                        { label: 'Interest Cut', data: annualInterestArray, backgroundColor: '#ef4444', borderRadius: 4 }
+                        { label: 'Principal Paid', data: annualPrincipalArray, backgroundColor: '#10b981', borderRadius: 4 },
+                        { label: 'Interest Bled', data: annualInterestArray, backgroundColor: '#f43f5e', borderRadius: 4 }
                     ]
                 },
                 options: {
