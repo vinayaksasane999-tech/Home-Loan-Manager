@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>30-Year Loan Shredder</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
@@ -22,7 +24,7 @@
         .header p { color: #8b93b3; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
 
         .card { background: rgba(10, 15, 35, 0.85); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); width: 100%; }
-        .section-title { font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+        .section-title { font-size: 14px; font-weight: 700; color: #cbd5e1; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -40,6 +42,9 @@
         .split-input { display: flex; gap: 5px; }
         .split-input input { flex: 1; min-width: 0; }
         .split-input select { width: 85px; padding: 12px 8px; cursor: pointer; }
+
+        .btn-premium { background: linear-gradient(135deg, #60a5fa, #3b82f6); border: none; color: white; padding: 8px 16px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); }
+        .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3); }
 
         .auto-calc-btn { cursor: pointer; color: #60a5fa; font-size: 10px; font-weight: bold; letter-spacing: 1px; transition: 0.2s; }
         .auto-calc-btn:hover { color: #facc15; }
@@ -63,9 +68,11 @@
         .text-blue { color: #60a5fa; }
 
         /* Inline Inputs */
-        .inline-input { background: transparent; border: none; border-bottom: 1px dashed rgba(96, 165, 250, 0.5); color: #60a5fa; font-size: 20px; font-weight: 900; width: 110px; text-align: center; outline: none; padding: 0; transition: 0.2s; -moz-appearance: textfield; }
-        .inline-input::-webkit-outer-spin-button, .inline-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .inline-input { background: transparent; border: none; border-bottom: 1px dashed rgba(96, 165, 250, 0.5); color: #60a5fa; font-size: 20px; font-weight: 900; width: 110px; text-align: center; outline: none; padding: 0; transition: 0.2s; }
         .inline-input:focus { border-bottom-color: #60a5fa; background: rgba(96, 165, 250, 0.05); }
+
+        /* Annual Stacked Bar Chart Wrapper */
+        .bar-chart-container { width: 100%; height: 260px; margin-top: 10px; position: relative; }
 
         /* Adaptive Amortization Engine Layout */
         .table-container { width: 100%; }
@@ -106,19 +113,18 @@
             .summary-wrapper { flex-direction: row; justify-content: space-around; }
             .chart-container { width: 240px; height: 240px; }
             .pie-value { font-size: 22px; }
+            .bar-chart-container { height: 320px; }
         }
 
         @media (max-width: 767px) {
-            /* Transform broad table into individual mobile dashboard cards */
             table, thead, tbody, th, td, tr { display: block; text-align: left; }
-            thead { display: none; } /* Hide heavy header columns on mobile */
+            thead { display: none; } 
             
             tr { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.04); padding: 14px; border-radius: 16px; margin-bottom: 12px; }
             td { border: none; padding: 6px 0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
             
             td:first-child { font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 4px; width: 100%; display: block; }
             
-            /* Append technical titles for mobile rows */
             td:nth-of-type(2)::before { content: "Opening Bal:"; color: #8b93b3; font-weight: 600; }
             td:nth-of-type(3)::before { content: "Total Paid:"; color: #8b93b3; font-weight: 600; }
             td:nth-of-type(4)::before { content: "Interest Cut:"; color: #8b93b3; font-weight: 600; }
@@ -126,11 +132,16 @@
             td:nth-of-type(6)::before { content: "Closing Bal:"; color: #8b93b3; font-weight: 600; }
             td:last-child { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; margin-top: 6px; justify-content: flex-end; }
         }
+
+        /* PDF Styling overrides to keep visual fidelity clean */
+        .pdf-mode { background: #040610 !important; padding: 30px !important; }
+        .pdf-mode .table-container { max-height: none !important; overflow: visible !important; }
+        .pdf-no-export { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="printableArea">
     <div class="header">
         <h1>The 30-Year Shredder</h1>
         <p>Tactical Debt Annihilation Engine</p>
@@ -163,7 +174,10 @@
     </div>
 
     <div class="card">
-        <div class="section-title">Phase 2: War Room Parameters</div>
+        <div class="section-title">
+            Phase 2: War Room Parameters
+            <button class="btn-premium pdf-no-export" onclick="exportToPDF()">Export Report PDF</button>
+        </div>
         <div class="config-grid">
             <div class="input-group">
                 <label>Loan Amount (₹)</label>
@@ -223,6 +237,13 @@
     </div>
 
     <div class="card">
+        <div class="section-title">Year-by-Year Amortization Velocity</div>
+        <div class="bar-chart-container">
+            <canvas id="annualBarChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
         <div class="section-title">Tactical Execution Ledger</div>
         <div class="table-container">
             <table id="scheduleTable">
@@ -247,6 +268,7 @@
 <script>
     let state = { paid: {}, strikes: {}, stepUps: {} };
     let loanChartInstance = null;
+    let barChartInstance = null;
 
     function formatCur(num) {
         return "₹" + Math.round(num).toLocaleString('en-IN');
@@ -332,10 +354,14 @@
         const monthlyRate = roi / 12 / 100;
         let runningBaseEmi = baseEmi;
 
+        // Visual tracking map for stacked bar graphs
+        let yearlyDataMap = {};
+
         while (balance > 0 && monthCount < 1200) { 
             let d = addMonths(startDateStr, monthCount);
             let monthKey = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2, '0');
             let displayDate = d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+            let calendarYear = d.getFullYear();
 
             let prevD = new Date(d);
             prevD.setMonth(prevD.getMonth() - 1);
@@ -375,13 +401,20 @@
                 extra: extraStrike
             });
 
+            // Map variables for stacked bar graphs
+            if (!yearlyDataMap[calendarYear]) {
+                yearlyDataMap[calendarYear] = { principal: 0, interest: 0 };
+            }
+            yearlyDataMap[calendarYear].principal += totalHit;
+            yearlyDataMap[calendarYear].interest += interestForMonth;
+
             totalInterest += interestForMonth;
             totalPrincipal += totalHit;
             balance = closingBalance;
             monthCount++;
         }
 
-        renderUI(schedule, totalPrincipal, totalInterest, targetLumpSum);
+        renderUI(schedule, totalPrincipal, totalInterest, targetLumpSum, yearlyDataMap);
     }
 
     function triggerStrike(monthKey, amount, dropdownId) {
@@ -396,7 +429,7 @@
         generateSchedule();
     }
 
-    function renderUI(schedule, totPrin, totInt, valLump) {
+    function renderUI(schedule, totPrin, totInt, valLump, yearlyDataMap) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
@@ -473,6 +506,7 @@
             tbody.appendChild(tr);
         });
 
+        // Dashboard Stats Update
         document.getElementById('statPrin').innerText = formatCur(totPrin);
         document.getElementById('statInt').innerText = formatCur(totInt);
         document.getElementById('pieTotal').innerText = formatCur(totPrin + totInt);
@@ -482,12 +516,13 @@
             document.getElementById('statDate').innerText = schedule[schedule.length - 1].date;
         }
 
-        const ctx = document.getElementById('loanChart').getContext('2d');
+        // Render Donut Graph
+        const ctxDonut = document.getElementById('loanChart').getContext('2d');
         if (loanChartInstance) {
             loanChartInstance.data.datasets[0].data = [totPrin, totInt];
             loanChartInstance.update();
         } else {
-            loanChartInstance = new Chart(ctx, {
+            loanChartInstance = new Chart(ctxDonut, {
                 type: 'doughnut',
                 data: {
                     labels: ['Principal Paid', 'Interest Bled'],
@@ -495,7 +530,7 @@
                         data: [totPrin, totInt],
                         backgroundColor: ['#4ade80', '#ef4444'],
                         borderWidth: 0,
-                        hoverOffset: 5
+                        hoverOffset: 4
                     }]
                 },
                 options: {
@@ -506,21 +541,76 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(10, 15, 35, 0.95)',
-                            titleColor: '#8b93b3',
-                            bodyColor: '#ffffff',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
                             padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return ' ' + context.label + ': ₹' + context.parsed.toLocaleString('en-IN');
-                                }
-                            }
+                            callbacks: { label: (context) => ' ' + context.label + ': ₹' + context.parsed.toLocaleString('en-IN') }
                         }
                     }
                 }
             });
         }
+
+        // Parse Stacked Bar Chart Maps
+        const yearsArray = Object.keys(yearlyDataMap);
+        const annualPrincipalArray = yearsArray.map(y => yearlyDataMap[y].principal);
+        const annualInterestArray = yearsArray.map(y => yearlyDataMap[y].interest);
+
+        // Render Stacked Bar Chart
+        const ctxBar = document.getElementById('annualBarChart').getContext('2d');
+        if (barChartInstance) {
+            barChartInstance.data.labels = yearsArray;
+            barChartInstance.data.datasets[0].data = annualPrincipalArray;
+            barChartInstance.data.datasets[1].data = annualInterestArray;
+            barChartInstance.update();
+        } else {
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: yearsArray,
+                    datasets: [
+                        { label: 'Principal Hit', data: annualPrincipalArray, backgroundColor: '#4ade80', borderRadius: 4 },
+                        { label: 'Interest Cut', data: annualInterestArray, backgroundColor: '#ef4444', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { color: '#8b93b3', font: { size: 10 } } },
+                        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b93b3', font: { size: 10 }, callbacks: (val) => '₹' + (val/100000) + 'L' } }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { color: '#cbd5e1', boxWidth: 12, font: { size: 11, weight: 'bold' } } },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 15, 35, 0.95)',
+                            padding: 12,
+                            callbacks: { label: (context) => ' ' + context.dataset.label + ': ₹' + Math.round(context.parsed.y).toLocaleString('en-IN') }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // PDF Export Execution Block
+    function exportToPDF() {
+        const element = document.getElementById('printableArea');
+        
+        // Temporarily tag body elements for crisp scaling inside PDF engine
+        document.body.classList.add('pdf-mode');
+        
+        const opt = {
+            margin:       [10, 10, 10, 10],
+            filename:     '30_Year_Loan_Shredder_Plan.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#040610' },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Restore smooth dark UI on user's active screen
+            document.body.classList.remove('pdf-mode');
+        });
     }
 
     window.onload = generateSchedule;
