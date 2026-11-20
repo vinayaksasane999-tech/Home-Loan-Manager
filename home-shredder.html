@@ -134,7 +134,7 @@ tr.paid .toggle-btn{background:#10b981;color:#000}
 
 .pdf-mode{background:#040610!important;padding:30px!important}.pdf-mode .table-container{max-height:none!important;overflow:visible!important}.pdf-no-export{display:none!important}
 
-/* Phase 1 and savings stack layout */
+/* Phase 1 and savings progress layout */
 
 .phase1-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:16px;align-items:stretch;width:100%}
 
@@ -181,8 +181,6 @@ tr.paid .toggle-btn{background:#10b981;color:#000}
 .savings-history-actions button:last-child{color:#f43f5e}
 
 .theme-control{position:fixed;top:14px;right:14px;z-index:1000;background:rgba(30,41,59,.92);color:white;border:1px solid rgba(255,255,255,.15);border-radius:30px;padding:9px 13px;font-size:11px;font-weight:800;cursor:pointer;backdrop-filter:blur(15px)}
-
-/* DAY THEME */
 
 body[data-theme="day"]{background:#eef2f8;color:#172033}
 
@@ -310,13 +308,11 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
       </div>
 
-      <!-- Possession Savings Stack -->
-
       <div class="card savings-card" id="savingsStackCard">
 
-        <div class="section-title" style="color:#60a5fa;border-bottom-color:rgba(96,165,250,.2)">Possession Savings Stack</div>
+        <div class="section-title" style="color:#60a5fa;border-bottom-color:rgba(96,165,250,.2)">Possession Savings Progress</div>
 
-        <div class="savings-total">Total Required Pot Amount</div>
+        <div class="savings-total">Total Savings Target</div>
 
         <div class="savings-amount">₹2,36,375</div>
 
@@ -330,7 +326,7 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
         <div style="margin-top:10px">
 
-          <div class="savings-total">Balance Amount to Add</div>
+          <div class="savings-total">Remaining Amount to Save</div>
 
           <div class="savings-remaining" id="potRemaining">₹2,36,375</div>
 
@@ -344,23 +340,23 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
         <div class="savings-form">
 
-          <label for="potSource">Contribution Source</label>
+          <label for="potSource">Savings Source</label>
 
           <input type="text" id="potSource" placeholder="e.g. Personal Savings, Credit Card">
 
-          <label for="potAmount">Contribution Amount (₹)</label>
+          <label for="potAmount">Savings Contribution (₹)</label>
 
           <input type="number" id="potAmount" min="0.01" step="0.01" placeholder="Enter amount">
 
-          <button class="savings-add-btn" id="addPotMoney" type="button">+ ADD MONEY TO POT</button>
+          <button class="savings-add-btn" id="addPotMoney" type="button">+ ADD SAVINGS</button>
 
         </div>
 
         <div class="savings-history">
 
-          <div class="savings-total">Contribution History</div>
+          <div class="savings-total">Savings History</div>
 
-          <div id="potHistory"><div style="color:#8b93b3;font-size:11px;padding:12px 0">No contributions added yet.</div></div>
+          <div id="potHistory"><div style="color:#8b93b3;font-size:11px;padding:12px 0">No savings added yet.</div></div>
 
         </div>
 
@@ -388,13 +384,29 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
     </div>
 
-    <div class="action-container pdf-no-export"><button class="btn-premium" onclick="exportToPDF()">Export Strategy Report PDF</button></div>
+    <div class="action-container pdf-no-export">
+
+      <button class="btn-premium" onclick="exportToPDF()">Export Strategy Report PDF</button>
+
+    </div>
 
     <div class="card" style="margin-top:16px">
 
         <div class="summary-wrapper">
 
-            <div class="chart-container"><canvas id="loanChart"></canvas><div class="chart-center-text"><div class="pie-title">Total Cost</div><div class="pie-value" id="pieTotal">₹0</div></div></div>
+            <div class="chart-container">
+
+              <canvas id="loanChart"></canvas>
+
+              <div class="chart-center-text">
+
+                <div class="pie-title">Total Cost</div>
+
+                <div class="pie-value" id="pieTotal">₹0</div>
+
+              </div>
+
+            </div>
 
             <div class="stats-grid">
 
@@ -412,7 +424,13 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
     </div>
 
-    <div class="card"><div class="section-title">Year-by-Year Principal vs Interest Analysis</div><div class="bar-chart-container"><canvas id="annualBarChart"></canvas></div></div>
+    <div class="card">
+
+      <div class="section-title">Year-by-Year Principal vs Interest Analysis</div>
+
+      <div class="bar-chart-container"><canvas id="annualBarChart"></canvas></div>
+
+    </div>
 
     <div class="card">
 
@@ -422,7 +440,17 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
             <table id="scheduleTable">
 
-                <thead><tr><th>Month</th><th>Opening Balance</th><th>Total Paid</th><th>Interest Cut</th><th>Principal Hit</th><th>Closing Balance</th><th>Actions</th></tr></thead>
+                <thead>
+
+                  <tr>
+
+                    <th>Month</th><th>Opening Balance</th><th>Total Paid</th>
+
+                    <th>Interest Cut</th><th>Principal Hit</th><th>Closing Balance</th><th>Actions</th>
+
+                  </tr>
+
+                </thead>
 
                 <tbody id="tableBody"></tbody>
 
@@ -436,8 +464,6 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
 <script>
 
-/* ORIGINAL HOME LOAN MANAGER LOGIC */
-
 let state = JSON.parse(localStorage.getItem('loan_shredder_state')) || { paid: {}, strikes: {}, stepUps: {} };
 
 let loanChartInstance = null;
@@ -450,25 +476,141 @@ function formatCur(num){return "₹"+Math.round(num).toLocaleString('en-IN')}
 
 function addMonths(dateStr,months){let d=new Date(dateStr);d.setMonth(d.getMonth()+months);return d}
 
-function toggleDropdown(event,dropdownId){event.stopPropagation();document.querySelectorAll('.dropdown-content').forEach(el=>{if(el.id!==dropdownId)el.classList.remove('show')});const dropdown=document.getElementById(dropdownId);if(dropdown)dropdown.classList.toggle('show')}
+function toggleDropdown(event,dropdownId){
 
-window.onclick=function(event){if(!event.target.matches('.strike-btn')&&!event.target.closest('.dropdown-content')){document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.remove('show'))}}
+ event.stopPropagation();
 
-function updatePhase1(){const loanAmount=parseFloat(document.getElementById('inpLoan').value)||0;const disbursed=parseFloat(document.getElementById('inpDisbursed').value)||0;let pending=loanAmount-disbursed;if(pending<0)pending=0;document.getElementById('phase1TotalLoan').innerText=formatCur(loanAmount);document.getElementById('statPending').innerText=formatCur(pending);localStorage.setItem('shredder_disbursed',disbursed);localStorage.setItem('shredder_preemi',document.getElementById('inpPreEmi').value)}
+ document.querySelectorAll('.dropdown-content').forEach(el=>{if(el.id!==dropdownId)el.classList.remove('show')});
 
-function autoCalculateBaseEmi(){const loanAmount=parseFloat(document.getElementById('inpLoan').value);const roi=parseFloat(document.getElementById('inpRoi').value);if(loanAmount>0&&roi>0){const monthlyRate=roi/12/100;const n=360;const calculatedEmi=loanAmount*monthlyRate*Math.pow(1+monthlyRate,n)/(Math.pow(1+monthlyRate,n)-1);document.getElementById('inpEmi').value=Math.round(calculatedEmi);saveInputs();generateSchedule()}}
+ const dropdown=document.getElementById(dropdownId);
 
-function saveInputs(){localStorage.setItem('shredder_loan',document.getElementById('inpLoan').value);localStorage.setItem('shredder_roi',document.getElementById('inpRoi').value);localStorage.setItem('shredder_emi',document.getElementById('inpEmi').value);localStorage.setItem('shredder_lump',document.getElementById('inpLump').value);localStorage.setItem('shredder_date',document.getElementById('inpDate').value)}
+ if(dropdown)dropdown.classList.toggle('show')
 
-function loadInputs(){if(localStorage.getItem('shredder_loan'))document.getElementById('inpLoan').value=localStorage.getItem('shredder_loan');if(localStorage.getItem('shredder_roi'))document.getElementById('inpRoi').value=localStorage.getItem('shredder_roi');if(localStorage.getItem('shredder_emi'))document.getElementById('inpEmi').value=localStorage.getItem('shredder_emi');if(localStorage.getItem('shredder_lump'))document.getElementById('inpLump').value=localStorage.getItem('shredder_lump');if(localStorage.getItem('shredder_date'))document.getElementById('inpDate').value=localStorage.getItem('shredder_date');if(localStorage.getItem('shredder_disbursed'))document.getElementById('inpDisbursed').value=localStorage.getItem('shredder_disbursed');if(localStorage.getItem('shredder_preemi'))document.getElementById('inpPreEmi').value=localStorage.getItem('shredder_preemi')}
+}
 
-function applyStepUp(event,monthKey,dropdownId){event.stopPropagation();const val=parseFloat(document.getElementById('stepVal-'+monthKey).value)||0;const type=document.getElementById('stepType-'+monthKey).value;state.stepUps[monthKey]={val:val,type:type};saveState();document.getElementById(dropdownId).classList.remove('show');generateSchedule()}
+window.onclick=function(event){
 
-function removeStepUp(event,monthKey,dropdownId){event.stopPropagation();delete state.stepUps[monthKey];saveState();document.getElementById(dropdownId).classList.remove('show');generateSchedule()}
+ if(!event.target.matches('.strike-btn')&&!event.target.closest('.dropdown-content')){
+
+  document.querySelectorAll('.dropdown-content').forEach(el=>el.classList.remove('show'))
+
+ }
+
+}
+
+function updatePhase1(){
+
+ const loanAmount=parseFloat(document.getElementById('inpLoan').value)||0;
+
+ const disbursed=parseFloat(document.getElementById('inpDisbursed').value)||0;
+
+ let pending=loanAmount-disbursed;
+
+ if(pending<0)pending=0;
+
+ document.getElementById('phase1TotalLoan').innerText=formatCur(loanAmount);
+
+ document.getElementById('statPending').innerText=formatCur(pending);
+
+ localStorage.setItem('shredder_disbursed',disbursed);
+
+ localStorage.setItem('shredder_preemi',document.getElementById('inpPreEmi').value)
+
+}
+
+function autoCalculateBaseEmi(){
+
+ const loanAmount=parseFloat(document.getElementById('inpLoan').value);
+
+ const roi=parseFloat(document.getElementById('inpRoi').value);
+
+ if(loanAmount>0&&roi>0){
+
+  const monthlyRate=roi/12/100;
+
+  const n=360;
+
+  const calculatedEmi=loanAmount*monthlyRate*Math.pow(1+monthlyRate,n)/(Math.pow(1+monthlyRate,n)-1);
+
+  document.getElementById('inpEmi').value=Math.round(calculatedEmi);
+
+  saveInputs();
+
+  generateSchedule()
+
+ }
+
+}
+
+function saveInputs(){
+
+ localStorage.setItem('shredder_loan',document.getElementById('inpLoan').value);
+
+ localStorage.setItem('shredder_roi',document.getElementById('inpRoi').value);
+
+ localStorage.setItem('shredder_emi',document.getElementById('inpEmi').value);
+
+ localStorage.setItem('shredder_lump',document.getElementById('inpLump').value);
+
+ localStorage.setItem('shredder_date',document.getElementById('inpDate').value)
+
+}
+
+function loadInputs(){
+
+ if(localStorage.getItem('shredder_loan'))document.getElementById('inpLoan').value=localStorage.getItem('shredder_loan');
+
+ if(localStorage.getItem('shredder_roi'))document.getElementById('inpRoi').value=localStorage.getItem('shredder_roi');
+
+ if(localStorage.getItem('shredder_emi'))document.getElementById('inpEmi').value=localStorage.getItem('shredder_emi');
+
+ if(localStorage.getItem('shredder_lump'))document.getElementById('inpLump').value=localStorage.getItem('shredder_lump');
+
+ if(localStorage.getItem('shredder_date'))document.getElementById('inpDate').value=localStorage.getItem('shredder_date');
+
+ if(localStorage.getItem('shredder_disbursed'))document.getElementById('inpDisbursed').value=localStorage.getItem('shredder_disbursed');
+
+ if(localStorage.getItem('shredder_preemi'))document.getElementById('inpPreEmi').value=localStorage.getItem('shredder_preemi')
+
+}
+
+function applyStepUp(event,monthKey,dropdownId){
+
+ event.stopPropagation();
+
+ const val=parseFloat(document.getElementById('stepVal-'+monthKey).value)||0;
+
+ const type=document.getElementById('stepType-'+monthKey).value;
+
+ state.stepUps[monthKey]={val:val,type:type};
+
+ saveState();
+
+ document.getElementById(dropdownId).classList.remove('show');
+
+ generateSchedule()
+
+}
+
+function removeStepUp(event,monthKey,dropdownId){
+
+ event.stopPropagation();
+
+ delete state.stepUps[monthKey];
+
+ saveState();
+
+ document.getElementById(dropdownId).classList.remove('show');
+
+ generateSchedule()
+
+}
 
 function generateSchedule(){
 
- saveInputs();updatePhase1();
+ saveInputs();
+
+ updatePhase1();
 
  const loanAmount=parseFloat(document.getElementById('inpLoan').value);
 
@@ -482,7 +624,9 @@ function generateSchedule(){
 
  let balance=loanAmount,totalInterest=0,totalPrincipal=0,schedule=[],monthCount=0;
 
- const monthlyRate=roi/12/100;let runningBaseEmi=baseEmi,yearlyDataMap={};
+ const monthlyRate=roi/12/100;
+
+ let runningBaseEmi=baseEmi,yearlyDataMap={};
 
  while(balance>0&&monthCount<1200){
 
@@ -494,11 +638,21 @@ function generateSchedule(){
 
   let calendarYear=d.getFullYear();
 
-  let prevD=new Date(d);prevD.setMonth(prevD.getMonth()-1);
+  let prevD=new Date(d);
+
+  prevD.setMonth(prevD.getMonth()-1);
 
   let prevKey=prevD.getFullYear()+"-"+String(prevD.getMonth()+1).padStart(2,'0');
 
-  if(prevKey.endsWith('-12')&&state.stepUps[prevKey]){let su=state.stepUps[prevKey];if(su.type==='pct')runningBaseEmi=runningBaseEmi*(1+su.val/100);else runningBaseEmi=runningBaseEmi+su.val}
+  if(prevKey.endsWith('-12')&&state.stepUps[prevKey]){
+
+   let su=state.stepUps[prevKey];
+
+   if(su.type==='pct')runningBaseEmi=runningBaseEmi*(1+su.val/100);
+
+   else runningBaseEmi=runningBaseEmi+su.val
+
+  }
 
   let interestForMonth=balance*monthlyRate;
 
@@ -508,17 +662,39 @@ function generateSchedule(){
 
   let totalHit=expectedPrincipal+extraStrike;
 
-  if(totalHit>balance){totalHit=balance;runningBaseEmi=totalHit+interestForMonth-extraStrike}
+  if(totalHit>balance){
+
+   totalHit=balance;
+
+   runningBaseEmi=totalHit+interestForMonth-extraStrike
+
+  }
 
   let closingBalance=balance-totalHit;
 
-  schedule.push({key:monthKey,date:displayDate,open:balance,emi:runningBaseEmi+extraStrike,currentBaseEmi:runningBaseEmi,interest:interestForMonth,principal:totalHit,close:closingBalance,extra:extraStrike});
+  schedule.push({
+
+   key:monthKey,date:displayDate,open:balance,emi:runningBaseEmi+extraStrike,
+
+   currentBaseEmi:runningBaseEmi,interest:interestForMonth,
+
+   principal:totalHit,close:closingBalance,extra:extraStrike
+
+  });
 
   if(!yearlyDataMap[calendarYear])yearlyDataMap[calendarYear]={principal:0,interest:0};
 
-  yearlyDataMap[calendarYear].principal+=totalHit;yearlyDataMap[calendarYear].interest+=interestForMonth;
+  yearlyDataMap[calendarYear].principal+=totalHit;
 
-  totalInterest+=interestForMonth;totalPrincipal+=totalHit;balance=closingBalance;monthCount++;
+  yearlyDataMap[calendarYear].interest+=interestForMonth;
+
+  totalInterest+=interestForMonth;
+
+  totalPrincipal+=totalHit;
+
+  balance=closingBalance;
+
+  monthCount++
 
  }
 
@@ -526,43 +702,149 @@ function generateSchedule(){
 
 }
 
-function triggerStrike(monthKey,amount,dropdownId){if(!state.strikes[monthKey])state.strikes[monthKey]=0;state.strikes[monthKey]+=amount;saveState();document.getElementById(dropdownId).classList.remove('show');generateSchedule()}
+function triggerStrike(monthKey,amount,dropdownId){
 
-function removeStrike(event,monthKey,dropdownId){event.stopPropagation();delete state.strikes[monthKey];saveState();document.getElementById(dropdownId).classList.remove('show');generateSchedule()}
+ if(!state.strikes[monthKey])state.strikes[monthKey]=0;
 
-function togglePaid(monthKey){state.paid[monthKey]=!state.paid[monthKey];saveState();generateSchedule()}
+ state.strikes[monthKey]+=amount;
+
+ saveState();
+
+ document.getElementById(dropdownId).classList.remove('show');
+
+ generateSchedule()
+
+}
+
+function removeStrike(event,monthKey,dropdownId){
+
+ event.stopPropagation();
+
+ delete state.strikes[monthKey];
+
+ saveState();
+
+ document.getElementById(dropdownId).classList.remove('show');
+
+ generateSchedule()
+
+}
+
+function togglePaid(monthKey){
+
+ state.paid[monthKey]=!state.paid[monthKey];
+
+ saveState();
+
+ generateSchedule()
+
+}
 
 function renderUI(schedule,totPrin,totInt,valLump,yearlyDataMap){
 
- const tbody=document.getElementById('tableBody');tbody.innerHTML='';
+ const tbody=document.getElementById('tableBody');
+
+ tbody.innerHTML='';
 
  schedule.forEach(row=>{
 
   const isPaid=state.paid[row.key]?'paid':'';
 
-  let badgesHtml='';if(row.extra>0)badgesHtml+='<div class="extra-badge">💥 + '+formatCur(row.extra)+'</div>';
+  let badgesHtml='';
 
-  if(state.stepUps[row.key]){let su=state.stepUps[row.key];let label=su.type==='pct'?`+${su.val}%`:`+₹${su.val}`;badgesHtml+=`<div class="extra-badge" style="background:rgba(96,165,250,.15);color:#60a5fa">📈 ${label}</div>`}
+  if(row.extra>0)badgesHtml+='<div class="extra-badge">💥 + '+formatCur(row.extra)+'</div>';
 
-  const isDecember=row.key.endsWith("-12"),dropdownId='dropdown-'+row.key;let strikeMenuHtml='';
+  if(state.stepUps[row.key]){
+
+   let su=state.stepUps[row.key];
+
+   let label=su.type==='pct'?`+${su.val}%`:`+₹${su.val}`;
+
+   badgesHtml+=`<div class="extra-badge" style="background:rgba(96,165,250,.15);color:#60a5fa">📈 ${label}</div>`
+
+  }
+
+  const isDecember=row.key.endsWith("-12");
+
+  const dropdownId='dropdown-'+row.key;
+
+  let strikeMenuHtml='';
 
   if(isDecember){
 
    let stepUpUI='';
 
-   if(state.stepUps[row.key]){let su=state.stepUps[row.key];let label=su.type==='pct'?`+${su.val}%`:`+₹${su.val}`;stepUpUI=`<div style="padding:10px 14px;background:rgba(74,222,128,.08);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center"><span style="color:#10b981;font-size:12px;font-weight:bold">✅ Next Yr: ${label}</span><span onclick="removeStepUp(event,'${row.key}','${dropdownId}')" style="color:#f43f5e;font-size:12px;cursor:pointer;font-weight:bold;padding:2px 6px">✕</span></div>`}
+   if(state.stepUps[row.key]){
 
-   else{stepUpUI=`<div style="padding:12px;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.05)"><div style="font-size:10px;color:#8b93b3;margin-bottom:8px;font-weight:bold;text-transform:uppercase">Increase Next Year's EMI</div><div style="display:flex;gap:6px;margin-bottom:8px"><input type="number" id="stepVal-${row.key}" value="11" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:white;border-radius:6px;padding:6px;outline:none;font-size:13px;font-weight:bold"><select id="stepType-${row.key}" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:white;border-radius:6px;padding:6px;outline:none;font-size:13px;font-weight:bold;cursor:pointer"><option value="pct" style="color:black">%</option><option value="amt" style="color:black">₹</option></select></div><button onclick="applyStepUp(event,'${row.key}','${dropdownId}')" style="width:100%;background:rgba(96,165,250,.08);border:1px solid #60a5fa;color:#60a5fa;border-radius:6px;padding:6px;cursor:pointer;font-size:12px;font-weight:bold">Lock In</button></div>`}
+    let su=state.stepUps[row.key];
+
+    let label=su.type==='pct'?`+${su.val}%`:`+₹${su.val}`;
+
+    stepUpUI=`<div style="padding:10px 14px;background:rgba(74,222,128,.08);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center"><span style="color:#10b981;font-size:12px;font-weight:bold">✅ Next Yr: ${label}</span><span onclick="removeStepUp(event,'${row.key}','${dropdownId}')" style="color:#f43f5e;font-size:12px;cursor:pointer;font-weight:bold;padding:2px 6px">✕</span></div>`
+
+   }else{
+
+    stepUpUI=`<div style="padding:12px;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.05)">
+
+      <div style="font-size:10px;color:#8b93b3;margin-bottom:8px;font-weight:bold;text-transform:uppercase">Increase Next Year's EMI</div>
+
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+
+        <input type="number" id="stepVal-${row.key}" value="11" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:white;border-radius:6px;padding:6px;outline:none;font-size:13px;font-weight:bold">
+
+        <select id="stepType-${row.key}" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:white;border-radius:6px;padding:6px;outline:none;font-size:13px;font-weight:bold;cursor:pointer">
+
+          <option value="pct" style="color:black">%</option>
+
+          <option value="amt" style="color:black">₹</option>
+
+        </select>
+
+      </div>
+
+      <button onclick="applyStepUp(event,'${row.key}','${dropdownId}')" style="width:100%;background:rgba(96,165,250,.08);border:1px solid #60a5fa;color:#60a5fa;border-radius:6px;padding:6px;cursor:pointer;font-size:12px;font-weight:bold">Lock In</button>
+
+    </div>`
+
+   }
 
    let clearStrikeUI=row.extra>0?`<button class="strike-action" onclick="removeStrike(event,'${row.key}','${dropdownId}')" style="color:#f43f5e;font-weight:bold;border-top:1px solid rgba(255,255,255,.05)">Reset Extra Payment ✕</button>`:'';
 
-   strikeMenuHtml=`<div class="strike-menu"><button class="strike-btn" onclick="toggleDropdown(event,'${dropdownId}')">+</button><div class="dropdown-content" id="${dropdownId}"><button class="strike-action" onclick="triggerStrike('${row.key}',${row.currentBaseEmi},'${dropdownId}')">🔥 13th EMI (${formatCur(row.currentBaseEmi)})</button><button class="strike-action" onclick="triggerStrike('${row.key}',${valLump},'${dropdownId}')">💣 Lump Sum (${formatCur(valLump)})</button>${clearStrikeUI}${stepUpUI}</div></div>`
+   strikeMenuHtml=`<div class="strike-menu">
+
+     <button class="strike-btn" onclick="toggleDropdown(event,'${dropdownId}')">+</button>
+
+     <div class="dropdown-content" id="${dropdownId}">
+
+       <button class="strike-action" onclick="triggerStrike('${row.key}',${row.currentBaseEmi},'${dropdownId}')">🔥 13th EMI (${formatCur(row.currentBaseEmi)})</button>
+
+       <button class="strike-action" onclick="triggerStrike('${row.key}',${valLump},'${dropdownId}')">💣 Lump Sum (${formatCur(valLump)})</button>
+
+       ${clearStrikeUI}${stepUpUI}
+
+     </div>
+
+   </div>`
 
   }
 
-  const tr=document.createElement('tr');tr.className=isPaid;
+  const tr=document.createElement('tr');
 
-  tr.innerHTML=`<td><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">${row.date} ${badgesHtml}</div></td><td>${formatCur(row.open)}</td><td><strong class="text-blue">${formatCur(row.emi)}</strong></td><td class="text-red">${formatCur(row.interest)}</td><td class="text-green">${formatCur(row.principal)}</td><td>${formatCur(row.close)}</td><td class="action-cell"><button class="toggle-btn" onclick="togglePaid('${row.key}')">${state.paid[row.key]?'PAID ✓':'MARK PAID'}</button>${strikeMenuHtml}</td>`;
+  tr.className=isPaid;
+
+  tr.innerHTML=`<td><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">${row.date} ${badgesHtml}</div></td>
+
+  <td>${formatCur(row.open)}</td>
+
+  <td><strong class="text-blue">${formatCur(row.emi)}</strong></td>
+
+  <td class="text-red">${formatCur(row.interest)}</td>
+
+  <td class="text-green">${formatCur(row.principal)}</td>
+
+  <td>${formatCur(row.close)}</td>
+
+  <td class="action-cell"><button class="toggle-btn" onclick="togglePaid('${row.key}')">${state.paid[row.key]?'PAID ✓':'MARK PAID'}</button>${strikeMenuHtml}</td>`;
 
   tbody.appendChild(tr)
 
@@ -586,27 +868,137 @@ function renderCharts(totPrin,totInt,yearlyDataMap){
 
  const ctxDonut=document.getElementById('loanChart').getContext('2d');
 
- if(loanChartInstance){loanChartInstance.data.datasets[0].data=[totPrin,totInt];loanChartInstance.update()}
+ if(loanChartInstance){
 
- else{loanChartInstance=new Chart(ctxDonut,{type:'doughnut',data:{labels:['Principal Paid','Interest Bled'],datasets:[{data:[totPrin,totInt],backgroundColor:['#10b981','#f43f5e'],borderWidth:0,borderRadius:8,spacing:6,hoverOffset:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'82%',plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(10,15,35,.95)',padding:12,callbacks:{label:context=>' '+context.label+': ₹'+context.parsed.toLocaleString('en-IN')}}}}})}
+  loanChartInstance.data.datasets[0].data=[totPrin,totInt];
 
- const yearsArray=Object.keys(yearlyDataMap),annualPrincipalArray=yearsArray.map(y=>yearlyDataMap[y].principal),annualInterestArray=yearsArray.map(y=>yearlyDataMap[y].interest);
+  loanChartInstance.update()
+
+ }else{
+
+  loanChartInstance=new Chart(ctxDonut,{
+
+   type:'doughnut',
+
+   data:{
+
+    labels:['Principal Paid','Interest Bled'],
+
+    datasets:[{data:[totPrin,totInt],backgroundColor:['#10b981','#f43f5e'],borderWidth:0,borderRadius:8,spacing:6,hoverOffset:3}]
+
+   },
+
+   options:{
+
+    responsive:true,maintainAspectRatio:false,cutout:'82%',
+
+    plugins:{
+
+     legend:{display:false},
+
+     tooltip:{backgroundColor:'rgba(10,15,35,.95)',padding:12,callbacks:{label:context=>' '+context.label+': ₹'+context.parsed.toLocaleString('en-IN')}}
+
+    }
+
+   }
+
+  })
+
+ }
+
+ const yearsArray=Object.keys(yearlyDataMap);
+
+ const annualPrincipalArray=yearsArray.map(y=>yearlyDataMap[y].principal);
+
+ const annualInterestArray=yearsArray.map(y=>yearlyDataMap[y].interest);
 
  const ctxBar=document.getElementById('annualBarChart').getContext('2d');
 
- if(barChartInstance){barChartInstance.data.labels=yearsArray;barChartInstance.data.datasets[0].data=annualPrincipalArray;barChartInstance.data.datasets[1].data=annualInterestArray;barChartInstance.update()}
+ if(barChartInstance){
 
- else{barChartInstance=new Chart(ctxBar,{type:'bar',data:{labels:yearsArray,datasets:[{label:'Principal Paid',data:annualPrincipalArray,backgroundColor:'#10b981',borderRadius:4},{label:'Interest Bled',data:annualInterestArray,backgroundColor:'#f43f5e',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:false,grid:{display:false},ticks:{color:'#8b93b3',font:{size:10}}},y:{stacked:false,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b93b3',font:{size:10},callbacks:val=>'₹'+(val/100000)+'L'}}},plugins:{legend:{display:true,position:'top',labels:{color:'#cbd5e1',boxWidth:12,font:{size:11,weight:'bold'}}},tooltip:{backgroundColor:'rgba(10,15,35,.95)',padding:12,callbacks:{label:context=>' '+context.dataset.label+': ₹'+Math.round(context.parsed.y).toLocaleString('en-IN')}}}}})}
+  barChartInstance.data.labels=yearsArray;
+
+  barChartInstance.data.datasets[0].data=annualPrincipalArray;
+
+  barChartInstance.data.datasets[1].data=annualInterestArray;
+
+  barChartInstance.update()
+
+ }else{
+
+  barChartInstance=new Chart(ctxBar,{
+
+   type:'bar',
+
+   data:{
+
+    labels:yearsArray,
+
+    datasets:[
+
+     {label:'Principal Paid',data:annualPrincipalArray,backgroundColor:'#10b981',borderRadius:4},
+
+     {label:'Interest Bled',data:annualInterestArray,backgroundColor:'#f43f5e',borderRadius:4}
+
+    ]
+
+   },
+
+   options:{
+
+    responsive:true,maintainAspectRatio:false,
+
+    scales:{
+
+     x:{stacked:false,grid:{display:false},ticks:{color:'#8b93b3',font:{size:10}}},
+
+     y:{stacked:false,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b93b3',font:{size:10},callbacks:val=>'₹'+(val/100000)+'L'}}
+
+    },
+
+    plugins:{
+
+     legend:{display:true,position:'top',labels:{color:'#cbd5e1',boxWidth:12,font:{size:11,weight:'bold'}}},
+
+     tooltip:{backgroundColor:'rgba(10,15,35,.95)',padding:12,callbacks:{label:context=>' '+context.dataset.label+': ₹'+Math.round(context.parsed.y).toLocaleString('en-IN')}}
+
+    }
+
+   }
+
+  })
+
+ }
 
 }
 
 function exportToPDF(){
 
- const element=document.getElementById('printableArea');document.body.classList.add('pdf-mode');
+ const element=document.getElementById('printableArea');
 
- const opt={margin:[10,10,10,10],filename:'30_Year_Loan_Shredder_Plan.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#040610'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}};
+ document.body.classList.add('pdf-mode');
 
- html2pdf().set(opt).from(element).save().then(()=>document.body.classList.remove('pdf-mode')).catch(()=>document.body.classList.remove('pdf-mode'))
+ const opt={
+
+  margin:[10,10,10,10],
+
+  filename:'30_Year_Loan_Shredder_Plan.pdf',
+
+  image:{type:'jpeg',quality:.98},
+
+  html2canvas:{scale:2,useCORS:true,backgroundColor:'#040610'},
+
+  jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+
+  pagebreak:{mode:['avoid-all','css','legacy']}
+
+ };
+
+ html2pdf().set(opt).from(element).save()
+
+  .then(()=>document.body.classList.remove('pdf-mode'))
+
+  .catch(()=>document.body.classList.remove('pdf-mode'))
 
 }
 
@@ -616,25 +1008,41 @@ window.onload=function(){
 
  const fields=['inpLoan','inpRoi','inpEmi','inpLump','inpDate','inpDisbursed','inpPreEmi'];
 
- fields.forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',generateSchedule)});
+ fields.forEach(id=>{
 
- generateSchedule();
+  const el=document.getElementById(id);
+
+  if(el)el.addEventListener('input',generateSchedule)
+
+ });
+
+ generateSchedule()
 
 };
 
-/* POSSESSION SAVINGS STACK - separate storage; independent of loan data */
+/* SAVINGS TRACKER - keeps the existing storage key and saved entries */
 
 (function(){
 
  "use strict";
 
- const TARGET=236375,KEY="possession_savings_v1",THEME_KEY="loan_shredder_theme";
+ const TARGET=236375;
+
+ const KEY="possession_savings_v1";
+
+ const THEME_KEY="loan_shredder_theme";
 
  const COLORS=["#10b981","#3b82f6","#f59e0b","#a855f7","#ec4899","#14b8a6","#eab308","#64748b"];
 
  let entries=[];
 
- try{const saved=JSON.parse(localStorage.getItem(KEY)||"[]");entries=Array.isArray(saved)?saved:[]}catch(e){entries=[]}
+ try{
+
+  const saved=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+  entries=Array.isArray(saved)?saved:[]
+
+ }catch(e){entries=[]}
 
  const money=n=>"₹"+Math.round(n).toLocaleString("en-IN");
 
@@ -652,9 +1060,11 @@ window.onload=function(){
 
   if(s.includes("other"))return COLORS[3];
 
-  let hash=0;for(let i=0;i<s.length;i++)hash=(hash*31+s.charCodeAt(i))>>>0;
+  let hash=0;
 
-  return COLORS[4+(hash%(COLORS.length-4))];
+  for(let i=0;i<s.length;i++)hash=(hash*31+s.charCodeAt(i))>>>0;
+
+  return COLORS[4+(hash%(COLORS.length-4))]
 
  }
 
@@ -662,7 +1072,11 @@ window.onload=function(){
 
  function render(){
 
-  const total=entries.reduce((sum,e)=>sum+e.amount,0),pct=Math.min(100,total/TARGET*100),remaining=Math.max(0,TARGET-total);
+  const total=entries.reduce((sum,e)=>sum+e.amount,0);
+
+  const pct=Math.min(100,total/TARGET*100);
+
+  const remaining=Math.max(0,TARGET-total);
 
   document.getElementById("potSaved").textContent=money(total);
 
@@ -676,73 +1090,171 @@ window.onload=function(){
 
   entries.forEach(e=>totals.set(e.source,(totals.get(e.source)||0)+e.amount));
 
-  document.getElementById("potLegend").innerHTML=[...totals.entries()].map(([source,amount])=>`<div class="savings-legend-item"><span class="savings-dot" style="background:${colorFor(source)}"></span><span>${safe(source)} · ${money(amount)}</span></div>`).join("");
+  document.getElementById("potLegend").innerHTML=[...totals.entries()].map(([source,amount])=>
 
-  const history=document.getElementById("potHistory");history.innerHTML="";
+   `<div class="savings-legend-item"><span class="savings-dot" style="background:${colorFor(source)}"></span><span>${safe(source)} · ${money(amount)}</span></div>`
 
-  if(!entries.length){history.innerHTML='<div style="color:#8b93b3;font-size:11px;padding:12px 0">No contributions added yet.</div>';return}
+  ).join("");
+
+  const history=document.getElementById("potHistory");
+
+  history.innerHTML="";
+
+  if(!entries.length){
+
+   history.innerHTML='<div style="color:#8b93b3;font-size:11px;padding:12px 0">No savings added yet.</div>';
+
+   return
+
+  }
 
   [...entries].reverse().forEach(entry=>{
 
-   const row=document.createElement("div");row.className="savings-history-row";
+   const row=document.createElement("div");
 
-   const source=document.createElement("div");source.style.minWidth="0";
+   row.className="savings-history-row";
+
+   const source=document.createElement("div");
+
+   source.style.minWidth="0";
 
    source.innerHTML=`<div style="font-weight:700;color:${colorFor(entry.source)};overflow-wrap:anywhere">${safe(entry.source)}</div><div style="color:#8b93b3;font-size:9px;margin-top:3px">${new Date(entry.date).toLocaleDateString("en-IN")}</div>`;
 
-   const actions=document.createElement("div");actions.style.textAlign="right";actions.style.flexShrink="0";
+   const actions=document.createElement("div");
 
-   const amount=document.createElement("strong");amount.textContent=money(entry.amount);
+   actions.style.textAlign="right";
 
-   const controls=document.createElement("div");controls.className="savings-history-actions";
+   actions.style.flexShrink="0";
 
-   const edit=document.createElement("button");edit.type="button";edit.textContent="Edit";
+   const amount=document.createElement("strong");
+
+   amount.textContent=money(entry.amount);
+
+   const controls=document.createElement("div");
+
+   controls.className="savings-history-actions";
+
+   const edit=document.createElement("button");
+
+   edit.type="button";
+
+   edit.textContent="Edit";
 
    edit.addEventListener("click",()=>{
 
-    const newSource=prompt("Contribution source:",entry.source);if(newSource===null)return;
+    const newSource=prompt("Savings source:",entry.source);
 
-    const raw=prompt("Contribution amount (₹):",String(entry.amount));if(raw===null)return;
+    if(newSource===null)return;
+
+    const raw=prompt("Savings contribution (₹):",String(entry.amount));
+
+    if(raw===null)return;
 
     const newAmount=Number(raw);
 
-    if(!newSource.trim()||!Number.isFinite(newAmount)||newAmount<=0){alert("Enter a valid source and amount.");return}
+    if(!newSource.trim()||!Number.isFinite(newAmount)||newAmount<=0){
 
-    entry.source=newSource.trim();entry.amount=newAmount;persist();render();
+     alert("Enter a valid source and amount.");
+
+     return
+
+    }
+
+    entry.source=newSource.trim();
+
+    entry.amount=newAmount;
+
+    persist();
+
+    render()
 
    });
 
-   const del=document.createElement("button");del.type="button";del.textContent="Delete";
+   const del=document.createElement("button");
 
-   del.addEventListener("click",()=>{if(!confirm("Delete this contribution?"))return;entries=entries.filter(e=>e.id!==entry.id);persist();render()});
+   del.type="button";
 
-   controls.append(edit,del);actions.append(amount,controls);row.append(source,actions);history.appendChild(row);
+   del.textContent="Delete";
 
-  });
+   del.addEventListener("click",()=>{
+
+    if(!confirm("Delete this savings entry?"))return;
+
+    entries=entries.filter(e=>e.id!==entry.id);
+
+    persist();
+
+    render()
+
+   });
+
+   controls.append(edit,del);
+
+   actions.append(amount,controls);
+
+   row.append(source,actions);
+
+   history.appendChild(row)
+
+  })
 
  }
 
  function add(){
 
-  const source=document.getElementById("potSource").value.trim(),amount=Number(document.getElementById("potAmount").value);
+  const source=document.getElementById("potSource").value.trim();
 
-  if(!source){alert("Please enter a contribution source.");return}
+  const amount=Number(document.getElementById("potAmount").value);
 
-  if(!Number.isFinite(amount)||amount<=0){alert("Please enter a valid amount greater than zero.");return}
+  if(!source){
 
-  entries.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),source,amount,date:new Date().toISOString()});
+   alert("Please enter a savings source.");
 
-  persist();document.getElementById("potSource").value="";document.getElementById("potAmount").value="";render();
+   return
+
+  }
+
+  if(!Number.isFinite(amount)||amount<=0){
+
+   alert("Please enter a valid savings amount greater than zero.");
+
+   return
+
+  }
+
+  entries.push({
+
+   id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),
+
+   source,
+
+   amount,
+
+   date:new Date().toISOString()
+
+  });
+
+  persist();
+
+  document.getElementById("potSource").value="";
+
+  document.getElementById("potAmount").value="";
+
+  render()
 
  }
 
  document.getElementById("addPotMoney").addEventListener("click",add);
 
- document.getElementById("potAmount").addEventListener("keydown",e=>{if(e.key==="Enter")add()});
+ document.getElementById("potAmount").addEventListener("keydown",e=>{
+
+  if(e.key==="Enter")add()
+
+ });
 
  render();
 
- /* AUTO + MANUAL THEME: Auto -> Day -> Night -> Auto */
+ /* Theme switcher: Auto -> Day -> Night -> Auto */
 
  const media=window.matchMedia("(prefers-color-scheme: light)");
 
@@ -756,11 +1268,19 @@ window.onload=function(){
 
   const btn=document.getElementById("themeToggle");
 
-  if(btn){btn.textContent=mode==="auto"?"⚙ Auto":mode==="day"?"☀ Day":"🌙 Night";btn.setAttribute("aria-label","Theme preference: "+mode+". Tap to change.");}
+  if(btn){
+
+   btn.textContent=mode==="auto"?"⚙ Auto":mode==="day"?"☀ Day":"🌙 Night";
+
+   btn.setAttribute("aria-label","Theme preference: "+mode+". Tap to change.")
+
+  }
 
   if(typeof barChartInstance!=="undefined"&&barChartInstance){
 
-   const tick=actual==="day"?"#475569":"#8b93b3",legend=actual==="day"?"#334155":"#cbd5e1";
+   const tick=actual==="day"?"#475569":"#8b93b3";
+
+   const legend=actual==="day"?"#334155":"#cbd5e1";
 
    barChartInstance.options.scales.x.ticks.color=tick;
 
@@ -768,7 +1288,7 @@ window.onload=function(){
 
    barChartInstance.options.plugins.legend.labels.color=legend;
 
-   barChartInstance.update("none");
+   barChartInstance.update("none")
 
   }
 
@@ -784,15 +1304,23 @@ window.onload=function(){
 
   const next=current==="auto"?"day":current==="day"?"night":"auto";
 
-  localStorage.setItem(THEME_KEY,next);applyTheme();
+  localStorage.setItem(THEME_KEY,next);
+
+  applyTheme()
 
  });
 
- const onSystemChange=()=>{if((localStorage.getItem(THEME_KEY)||"auto")==="auto")applyTheme()};
+ const onSystemChange=()=>{
 
- if(media.addEventListener)media.addEventListener("change",onSystemChange);else media.addListener(onSystemChange);
+  if((localStorage.getItem(THEME_KEY)||"auto")==="auto")applyTheme()
 
- window.addEventListener("load",applyTheme);
+ };
+
+ if(media.addEventListener)media.addEventListener("change",onSystemChange);
+
+ else media.addListener(onSystemChange);
+
+ window.addEventListener("load",applyTheme)
 
 })();
 
