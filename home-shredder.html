@@ -134,7 +134,7 @@ tr.paid .toggle-btn{background:#10b981;color:#000}
 
 .pdf-mode{background:#040610!important;padding:30px!important}.pdf-mode .table-container{max-height:none!important;overflow:visible!important}.pdf-no-export{display:none!important}
 
-/* PHASE 1 AND SAVINGS STACK LAYOUT */
+/* Phase 1 and savings stack layout */
 
 .phase1-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:16px;align-items:stretch;width:100%}
 
@@ -152,29 +152,7 @@ tr.paid .toggle-btn{background:#10b981;color:#000}
 
 .savings-progress-fill{height:100%;width:0;background:linear-gradient(90deg,#10b981,#60a5fa);border-radius:20px;transition:width 1s ease}
 
-.savings-pot-area{display:flex;justify-content:center;padding:18px 0 22px;perspective:900px}
-
-.glass-pot{width:232px;height:270px;position:relative;isolation:isolate;filter:drop-shadow(0 18px 20px rgba(0,0,0,.32));transform:translateZ(0)}
-
-.pot-layers{position:absolute;z-index:2;left:5%;right:5%;top:11%;bottom:5%;overflow:hidden;clip-path:url(#matkaLiquidClip);-webkit-clip-path:url(#matkaLiquidClip);border-radius:0 0 42% 42%}
-
-.pot-liquid{position:absolute;left:0;width:100%;border-top:1px solid rgba(255,255,255,.42);box-shadow:inset 0 8px 18px rgba(255,255,255,.12),inset 0 -9px 16px rgba(0,0,0,.12);transition:height 1.25s cubic-bezier(.2,.75,.25,1),bottom 1.25s cubic-bezier(.2,.75,.25,1);background-image:linear-gradient(90deg,rgba(255,255,255,.20),transparent 22%,rgba(255,255,255,.07) 52%,rgba(255,255,255,.2) 86%,rgba(255,255,255,.08));overflow:visible}
-
-.pot-liquid:before{content:"";position:absolute;left:-3%;top:-6px;width:106%;height:14px;border-radius:48%;background:linear-gradient(180deg,rgba(255,255,255,.58),rgba(255,255,255,.10) 65%,transparent);filter:blur(.7px);animation:matkaRipple 4.6s ease-in-out infinite alternate}
-
-.pot-liquid:after{content:"";position:absolute;left:12%;right:15%;top:8px;height:22px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.19),transparent);filter:blur(6px)}
-
-@keyframes matkaRipple{0%{transform:translateX(-2%) scaleY(.78)}50%{transform:translateX(1%) scaleY(1.05)}100%{transform:translateX(2%) scaleY(.86)}}
-
-.matka-glass{position:absolute;inset:0;width:100%;height:100%;z-index:5;overflow:visible;pointer-events:none}
-
-.matka-bubble{position:absolute;z-index:4;bottom:12%;width:5px;height:5px;border:1px solid rgba(255,255,255,.7);border-radius:50%;background:rgba(255,255,255,.22);box-shadow:0 0 7px rgba(255,255,255,.38);animation:matkaBubble 5.8s linear infinite}
-
-.matka-bubble.b1{left:37%;animation-delay:-1s}.matka-bubble.b2{left:62%;width:4px;height:4px;animation-delay:-3.2s}.matka-bubble.b3{left:49%;width:3px;height:3px;animation-delay:-4.4s}
-
-@keyframes matkaBubble{0%{transform:translateY(0) scale(.7);opacity:0}15%{opacity:.8}85%{opacity:.55}100%{transform:translateY(-170px) scale(1.25);opacity:0}}
-
-.pot-progress{position:absolute;z-index:7;top:58%;width:100%;text-align:center;transform:translateY(-50%);font-size:17px;font-weight:900;color:white;text-shadow:0 2px 9px rgba(0,0,0,.8),0 0 12px rgba(255,255,255,.35);pointer-events:none}
+.savings-progress-label{font-size:11px;font-weight:800;color:#60a5fa;text-align:right;margin-top:-5px;margin-bottom:10px}
 
 .savings-form{display:grid;gap:8px;margin-top:12px}
 
@@ -231,6 +209,8 @@ body[data-theme="day"] th{color:#64748b;border-bottom-color:#cbd5e1}
 body[data-theme="day"] .savings-card{background:linear-gradient(145deg,#fff,#eaf1fa)}
 
 body[data-theme="day"] .savings-legend-item{color:#475569}
+
+body[data-theme="day"] .savings-progress-label{color:#2563eb}
 
 body[data-theme="day"] .theme-control{background:#fff;color:#172033;border-color:#cbd5e1}
 
@@ -330,7 +310,7 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
       </div>
 
-      <!-- POSSESSION SAVINGS STACK -->
+      <!-- Possession Savings Stack -->
 
       <div class="card savings-card" id="savingsStackCard">
 
@@ -358,51 +338,7 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 
         <div class="savings-progress-track"><div class="savings-progress-fill" id="potProgress"></div></div>
 
-        <div class="savings-pot-area">
-
-          <div class="glass-pot" id="glassPot">
-
-            <svg class="matka-glass" viewBox="0 0 240 280" aria-hidden="true">
-
-              <defs>
-
-                <clipPath id="matkaLiquidClip"><path d="M78 36 C77 56 74 70 59 87 C34 114 18 146 17 184 C16 225 42 254 78 261 C103 266 137 266 162 261 C198 254 224 225 223 184 C222 146 206 114 181 87 C166 70 163 56 162 36 Z"/></clipPath>
-
-                <linearGradient id="matkaGlassFill" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#e8f8ff" stop-opacity=".34"/><stop offset=".12" stop-color="#dff7ff" stop-opacity=".08"/><stop offset=".48" stop-color="#ffffff" stop-opacity=".015"/><stop offset=".82" stop-color="#d8f5ff" stop-opacity=".13"/><stop offset="1" stop-color="#ffffff" stop-opacity=".32"/></linearGradient>
-
-                <linearGradient id="matkaRim" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".42" stop-color="#a9d9f4" stop-opacity=".3"/><stop offset="1" stop-color="#ffffff" stop-opacity=".78"/></linearGradient>
-
-              </defs>
-
-              <path d="M78 36 C77 56 74 70 59 87 C34 114 18 146 17 184 C16 225 42 254 78 261 C103 266 137 266 162 261 C198 254 224 225 223 184 C222 146 206 114 181 87 C166 70 163 56 162 36 Z" fill="url(#matkaGlassFill)" stroke="rgba(225,246,255,.75)" stroke-width="2.2"/>
-
-              <path d="M78 36 C77 56 74 70 59 87 C34 114 18 146 17 184 C16 225 42 254 78 261 C103 266 137 266 162 261 C198 254 224 225 223 184 C222 146 206 114 181 87 C166 70 163 56 162 36" fill="none" stroke="rgba(255,255,255,.48)" stroke-width="5" stroke-linecap="round"/>
-
-              <path d="M78 37 C78 28 86 23 96 23 H144 C154 23 162 28 162 37 C162 46 154 51 144 51 H96 C86 51 78 46 78 37Z" fill="rgba(180,225,250,.10)" stroke="url(#matkaRim)" stroke-width="4"/>
-
-              <ellipse cx="120" cy="36.5" rx="43" ry="10" fill="rgba(4,12,28,.28)" stroke="rgba(238,250,255,.88)" stroke-width="3"/>
-
-              <path d="M46 132 C33 161 34 209 56 235" fill="none" stroke="rgba(255,255,255,.42)" stroke-width="5" stroke-linecap="round"/>
-
-              <path d="M190 112 C211 147 215 192 197 226" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="4" stroke-linecap="round"/>
-
-              <path d="M83 254 Q120 265 157 254" fill="none" stroke="rgba(255,255,255,.78)" stroke-width="3" stroke-linecap="round"/>
-
-              <ellipse cx="120" cy="261" rx="43" ry="7" fill="none" stroke="rgba(160,220,255,.42)" stroke-width="3"/>
-
-              <path d="M91 60 Q84 76 73 88" fill="none" stroke="rgba(255,255,255,.48)" stroke-width="3" stroke-linecap="round"/>
-
-            </svg>
-
-            <div class="pot-layers" id="potLayers"></div>
-
-            <span class="matka-bubble b1"></span><span class="matka-bubble b2"></span><span class="matka-bubble b3"></span>
-
-            <div class="pot-progress" id="potPercentage">0%</div>
-
-          </div>
-
-        </div>
+        <div class="savings-progress-label" id="potPercentage">0%</div>
 
         <div class="savings-legend" id="potLegend"></div>
 
@@ -499,6 +435,8 @@ body[data-theme="day"] .dropdown-content button.strike-action:hover{background:#
 </div>
 
 <script>
+
+/* ORIGINAL HOME LOAN MANAGER LOGIC */
 
 let state = JSON.parse(localStorage.getItem('loan_shredder_state')) || { paid: {}, strikes: {}, stepUps: {} };
 
@@ -730,27 +668,9 @@ window.onload=function(){
 
   document.getElementById("potRemaining").textContent=money(remaining);
 
-  document.getElementById("potPercentage").textContent=Math.round(pct)+"%";
+  document.getElementById("potPercentage").textContent=Math.round(pct)+"% complete";
 
   document.getElementById("potProgress").style.width=pct+"%";
-
-  let used=0,layers="";
-
-  entries.forEach(e=>{
-
-   if(used>=TARGET)return;
-
-   const visible=Math.min(e.amount,TARGET-used),height=visible/TARGET*100;
-
-   const color=colorFor(e.source);
-
-   layers+=`<div class="pot-liquid" title="${safe(e.source)}" style="bottom:${used/TARGET*100}%;height:${height}%;background:linear-gradient(180deg,${color}9c 0%,${color}bd 42%,${color}a8 100%);opacity:.78"></div>`;
-
-   used+=visible;
-
-  });
-
-  document.getElementById("potLayers").innerHTML=layers;
 
   const totals=new Map();
 
